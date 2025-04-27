@@ -3,7 +3,7 @@ name: Deploy to Cloud Run
 on:
   push:
     branches:
-      - main
+      - main  # or whatever your branch name is
 
 jobs:
   deploy:
@@ -13,15 +13,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_PROJECT_ID }}
-
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: shashigcp-454502
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          install_components: 'beta'
+
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Deploy to Cloud Run
         run: |
@@ -30,4 +31,4 @@ jobs:
             --region asia-south1 \
             --platform managed \
             --allow-unauthenticated \
-            --project shashigcp-454502
+            --project ${{ secrets.GCP_PROJECT_ID }}
