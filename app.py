@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return 'Hello Ultimetrix!'
+    return 'Hello hai!'
 
 if __name__ == '__main__':
     # Ensuring the app runs on the correct port
