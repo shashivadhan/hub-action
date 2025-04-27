@@ -21,12 +21,17 @@ jobs:
           project_id: shashigcp-454502  # Replace with your GCP project ID
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}  # Path to the secret containing the GCP service account credentials
 
-      # Step 3: Configure GCloud to use your project (this ensures the proper project is used)
+      # Step 3: Authenticate using the service account credentials
+      - name: Authenticate to Google Cloud
+        run: |
+          gcloud auth activate-service-account --key-file="${{ secrets.GCP_CREDENTIALS }}"
+
+      # Step 4: Set GCloud project
       - name: Set GCloud project
         run: |
           gcloud config set project shashigcp-454502  # Replace with your GCP project ID
 
-      # Step 4: Build and deploy the container to Cloud Run
+      # Step 5: Build and deploy the container to Cloud Run
       - name: Build and deploy to Cloud Run
         run: |
           gcloud run deploy hello-cloudrun \
