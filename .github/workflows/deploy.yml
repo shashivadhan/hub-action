@@ -1,38 +1,36 @@
-name: Deploy to Cloud Run
+name: GCP Cloud Run Deployment
 
 on:
   push:
     branches:
-      - main  # or the branch you want to trigger the deploy from
+      - main  # Or any other branch you want to trigger the deployment from
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code
+      # Step 1: Checkout the code from the repository
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
-      # Step 2: Authenticate with Google Cloud
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      # Step 3: Set up Google Cloud SDK
+      # Step 2: Set up Google Cloud SDK
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          install_components: 'beta'
+          project_id: shashigcp-454502  # Replace with your GCP project ID
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}  # Path to the secret containing the GCP service account credentials
 
-      # Step 4: Deploy to Cloud Run
-      - name: Deploy to Cloud Run
+      # Step 3: Configure GCloud to use your project (this ensures the proper project is used)
+      - name: Set GCloud project
         run: |
-          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud config set project shashigcp-454502  # Replace with your GCP project ID
+
+      # Step 4: Build and deploy the container to Cloud Run
+      - name: Build and deploy to Cloud Run
+        run: |
           gcloud run deploy hello-cloudrun \
-            --source . \
-            --region asia-south1 \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/hello-cloudrun \
             --platform managed \
-            --allow-unauthenticated
+            --region asia-south1 \
+            --allow-unauthenticated  # Set this to 'false' if you want to restrict access
